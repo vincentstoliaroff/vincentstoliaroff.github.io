@@ -1,0 +1,416 @@
+---
+layout: post
+title: Presentation Package DiagrammeR
+output: github_document
+always_allow_html: yes
+comments: true
+categories:
+- blog
+tags:
+- shell
+- rmarkdown
+---
+
+#############
+# Introduction
+
+## Motivation
+
+### 1 - pimp up your Rmarkdown output
+Flowchart, Network Graph, Dependency graph, UML Diagrams, ER Model...
+
+### 2 - One workflow
+Everything happens in R
+
+### 3 - Easy Editing/Control 
+Literate Programming / Reproducible Research
+
+### 4 - Dynamic Updates
+Reporting
+
+
+## Focus: `DiagrammeR`
+
+### Package Candidates
+* CRAN Task View: https://cran.r-project.org/web/views/gR.html
+* Various Packages: `diagram`, `Rgraphviz` (Bioconductor), `networkD3`...
+
+### Upside
+* Extensive Tutorial: http://rich-iannone.github.io/DiagrammeR/index.html
+* Integration with RStudio (thanks to `htmlwidgets` dependency), especially for the DOT Language
+* Several Visualisation Engines with varied Layout
+
+### Walk-through Examples
+1. Data Modeling Schema
+2. A transport Network
+3. R Package Dependencies
+
+
+## Reminder: Graph Definition 
+### Nodes/Vertices
+```{r, echo=FALSE, fig.height=1, fig.align='center',fig.asp=.1}
+library(DiagrammeR)
+library(magrittr)
+  create_graph()%>%
+    add_node("Node 1")%>%
+    add_node("Node 2")%>%
+    add_node("Node 3")%>%
+    #set_global_graph_attrs("graph","rankdir","LR")%>%
+    render_graph(output="graph")
+```
+
+### Edges
+Directed Graph
+```{r, echo=FALSE, fig.height=1, fig.align='center',fig.asp=.1}
+create_graph()%>%
+  add_node("Node 1")%>%
+  add_node("Node 2")%>%
+  add_node("Node 3")%>%
+  add_edge(from=1,to=2)%>%
+  add_edge(from=2,to=3)%>%
+  set_global_graph_attrs("graph","rankdir","LR")%>%
+    render_graph(output="graph")
+```
+
+Undirected Graph
+```{r, echo=FALSE, fig.height=1, fig.align='center',fig.asp=.1}
+create_graph()%>%
+  add_node("Node 1")%>%
+  add_node("Node 2")%>%
+  add_node("Node 3")%>%
+  add_edge(from=1,to=2)%>%
+  add_edge(from=2,to=3)%>%
+  set_global_graph_attrs("graph","rankdir","LR")%>%
+  set_global_graph_attrs("edge","arrowhead","none")%>%
+    render_graph(output="graph")
+```
+
+
+
+
+#############
+# Becoming a `DiagrammeR` | A glimpse into the Package Design
+> 1. The Objects
+> 2. The Languages
+> 3. Querying Graph
+> 4. Visualising
+
+
+## 1 - Objects (1): Nodes & Edges | Data Frame
+```{r}
+NDF <-DiagrammeR::create_nodes(nodes = c("a", "b", "c"), # required
+                               type = "lower",color="aqua", shape=c("circle","circle","rectangle"),
+                               Value = c(3.5, 2.6, 9.4))
+
+EDF <- DiagrammeR::create_edges(from = c("a", "a"),to = c("b", "c"),color = "green",
+                                data = c(2.7, 8.9, 2.6, 0.6))
+head(NDF)
+head(EDF)
+```
+
+## 1 - Objects (2): Graph | List
+```{r}
+GRAPH<-DiagrammeR::create_graph(NDF,EDF)
+str(GRAPH,max.level=1)
+```
+
+## 2 - Language
+
+
+* DOT (Graphviz)
+* Mermaid 
+* R
+
+
+## 3 - Querying Graph
+
+### Statistics 
+`node_info`, `edge_info`, `node_count`...
+
+### Nodes and Edge Selection (Subgraph) 
+`select_nodes`, `select_nodes_by_id`, `select_nodes_in_neighborhood`...
+
+### Traversals
+`trav_out`, `trav_in`, `get_path`...  
+
+### No algorithms, No Modelling
+See `igraph` package...
+
+### Alternative: Direct processing of EDF & NDF 
+More efficient Data wrangling packages `dplyr`, `tidyr`...
+
+## 4 - Visualizing Graph
+
+### Node and Edge Attributes
+Color, Shape, Font, Fontsize... 
+
+### Layout
++ Graphviz Engine (`grViz()`)
+    Layout: dot,neato,twopi,circo (See example #3)
++ Mermaid Engine (`mermaid()`)
+    Layout: Gantt Chart
++ vizNetwork 
++ vivagraph
+
+#############
+# Example 1: Data Modeling Schema | Focus: the DOT Language
+## Input: GTFS Format | https://developers.google.com/transit/gtfs/reference#feed-files
+
+Filename | 	Defines
+-|:----------
+agency.txt |	One or more transit agencies that provide the data in this feed. Ex: DB, BVG
+stops.txt |	Individual locations where vehicles pick up or drop off passengers. Includes Latitude + Longitudes Ex: Alexanderplatz. 
+routes.txt |	Transit routes. A route is a group of trips that are displayed to riders as a single service. Ex: U2 Line
+trips.txt |	Trips for each route. A trip is a sequence of two or more stops that occurs at specific time. Ex: The U2 U-Bahn leaving today from klosterstr. Station at 13:01
+stop_times.txt 	|Times that a vehicle arrives at and departs from individual stops for each trip.
+calendar.txt |	Dates for service IDs using a weekly schedule. Specify when service starts and ends, as well as days of the week where service is available.
+
+
+## Editing DOT Code in RStudio
+![]({{ site.url }}/images/BRUG-RDBM-RStudio2.png){:class="img-responsive"}
+
+
+## Outputing with RMarkdown
+
+### in your R Code chunk 
+```{r, fig.align='center', fig.height=3}
+DiagrammeR::grViz("RDBM.gv")
+```
+
+#############
+# Example 2: Network | Focus = Creating NDF, EDF & Querying them
+
+## Input: Berlin Public Transportation Timetables 
+### Open Data 
+https://daten.berlin.de/datensaetze/vbb-fahrplandaten-ende-juni-bis-dezember-2016
+
+### Download
+```{r Berlin-GTFS, eval=TRUE, cache=TRUE}
+temp <- tempfile()
+download.file("http://www.vbb.de/de/download/GTFS_VBB_EndeJun_Dez2016.zip",temp)
+stops <- read.table(unz(temp,filename="stops.txt"),header=TRUE,sep=',',
+                    fileEncoding="UTF-8",stringsAsFactors = FALSE)
+stop_times <- read.table(unz(temp,filename="stop_times.txt"),header=TRUE,sep=',',
+                         fileEncoding="UTF-8",stringsAsFactors = FALSE)
+trips <- read.table(unz(temp,filename="trips.txt"),header=TRUE,sep=',',
+                    fileEncoding="UTF-8",stringsAsFactors = FALSE)
+routes <- read.table(unz(temp,filename="routes.txt"),header=TRUE,sep=',',
+                     fileEncoding="UTF-8",stringsAsFactors = FALSE)
+unlink(temp)
+```
+
+## Data Wrangling: U-Bahn Stations EDF
+```{r, eval=TRUE, echo=TRUE, message=FALSE, cache=TRUE}
+library(dplyr)
+edf_ubahn<-filter(routes,route_short_name%in%
+                    c("U1","U2","U3","U4","U5","U6","U7","U8"))%>%
+  select(route_id,route_short_name)%>%
+  left_join(trips,by="route_id")%>%
+  group_by(trip_headsign,route_short_name)%>%
+  summarise(trip_id=first(trip_id))%>%
+  ungroup()%>%
+  left_join(stop_times,by=c("trip_id"))%>%
+  left_join(transmute(stop_times,
+                      trip_id=trip_id,
+                      stop_id_to=stop_id,
+                      arrival_time_to=arrival_time,
+                      stop_sequence=stop_sequence-1),
+            by=c("trip_id","stop_sequence"))%>%
+  transmute(from=stop_id,to=stop_id_to,type=route_short_name)%>%
+  filter(!is.na(to))%>%unique%>%
+  mutate(color=ifelse(type=="U1","blue",NA)%>%
+                       ifelse(type=="U2","red",.)%>%ifelse(type=="U3","green",.)%>%
+                       ifelse(type=="U4","lime",.)%>%ifelse(type=="U5","gold",.)%>%
+                       ifelse(type=="U6","purple",.)%>%ifelse(type=="U7","purple",.)%>%
+                       ifelse(type=="U8","purple",.))%>%
+  as.data.frame
+```  
+
+## Data Wrangling: U-Bahn Stations NDF
+
+```{r NDF Berlin, eval=TRUE, echo=TRUE, message=FALSE}
+library(dplyr)
+ndf_ubahn<-filter(routes,route_short_name%in%
+                    c("U1","U2","U3","U4","U5","U6","U7","U8"))%>%
+  select(route_id,route_short_name)%>%
+  left_join(trips,by="route_id")%>%
+  group_by(trip_headsign,route_short_name)%>%
+  summarise(trip_id=first(trip_id))%>%
+  ungroup()%>%
+  left_join(stop_times,by=c("trip_id"))%>%
+  transmute(nodes=stop_id,stop_id=stop_id)%>%
+  unique%>%
+  left_join(stops,by="stop_id")%>%
+  transmute(nodes,label=stop_name,stop_lat,stop_lon)%>%
+  as.data.frame
+```  
+
+## Input for graph Creation
+
+```{r}
+head(edf_ubahn)
+head(ndf_ubahn)
+```
+
+## Create and visualize U-Bahn Graph
+```{r, eval=TRUE, echo=TRUE, message=FALSE}
+graph_ubahn<-DiagrammeR::create_graph(ndf_ubahn,edf_ubahn)
+DiagrammeR::render_graph(graph_ubahn,output="visNetwork")
+```  
+
+## Sub-network | Querying EDF & NDF directly 
+
+```{r, eval=TRUE, echo=TRUE, message=FALSE}
+# Function: get connected nodes within a given number of step
+recursive_dep<-function(edf,ndf,nodes,number_step) {
+  if (number_step == 0) return(nodes) else return(
+    union(dplyr::filter(edf,from%in%nodes)%>%.$to,nodes)%>%
+  recursive_dep(edf,ndf,nodes=.,number_step-1))
+}
+# Nodes Connected to Nollendorf with 3 step
+nodes_sub<-recursive_dep(edf=edf_ubahn,ndf=ndf_ubahn,
+                         nodes=dplyr::filter(ndf_ubahn,grepl('Nollendorf',label))%>%.$nodes,
+                         number_step=3)
+# Your Input object
+ndf_sub<-data.frame(nodes=nodes_sub)%>%dplyr::left_join(ndf_ubahn,by="nodes")
+edf_sub<-dplyr::filter(edf_ubahn,from%in%nodes_sub)
+``` 
+## Visualize Sub Network 
+
+```{r, eval=TRUE, echo=TRUE, message=FALSE}
+graph_sub<-DiagrammeR::create_graph(ndf_sub,edf_sub)
+DiagrammeR::render_graph(graph_sub,output="visNetwork")
+```  
+
+#############
+# Example 3: Package Dependencies | Focus: Graphviz Layout
+
+## Getting the Nodes from CRAN
+```{r , cache=TRUE}
+library(magrittr)
+con <- url("http://cran.r-project.org/src/contrib/PACKAGES") # DESCRIPTION Files 
+ndf_pack<- read.dcf(con, all = TRUE)%>%  # Parsing dcf into a Data Frame. 1 Line = 1 Node = 1 Package
+  dplyr::mutate(nodes=Package,label=Package) # Adding required columns `nodes` and `label` for NDF
+close(con)
+str(ndf_pack,width=100,strict.width="cut") # Quick check 
+```
+
+## Defining the Dependencies EDF
+
+For the `Imports` Dependencies
+```{r, warning=FALSE, cache=TRUE}
+edf_import<-ndf_pack%>%
+  dplyr::select(Package,Imports)%>%
+  tidyr::separate(col=Imports,
+             into=paste0("V",1:35),
+             sep=", ",
+             remove=TRUE)%>%
+  tidyr::gather(key=foo,
+                value=to,
+                -Package)%>%
+  dplyr::transmute(from=Package,
+                   to=to,
+                   rel="Import",
+                   color="DarkRed")%>%
+  dplyr::filter(!is.na(to))%>%
+  tidyr::separate(col=to,
+                into="to",
+                sep="\\s",
+                extra="drop")
+
+```
+Creating in the same way a `edf_depends` for the `Depends`...
+
+```{r, echo=FALSE, warning=FALSE, cache=TRUE}
+edf_depends<-ndf_pack%>%
+  dplyr::select(Package,Depends)%>%
+  tidyr::separate(col=Depends,
+                  into=paste0("V",1:35),
+                  sep=", ",
+                  remove=TRUE)%>%
+  tidyr::gather(key=foo,
+                value=to,
+                -Package)%>%
+  dplyr::transmute(from=Package,
+                   to=to,
+                   rel="Depends",
+                   color="DarkSlateBlue")%>%
+  dplyr::filter(!is.na(to))%>%
+  tidyr::separate(col=to,
+                into="to",
+                sep="\\s",
+                extra="drop")
+```
+
+## Create Dependencies Graph for `DiagrammeR` Package
+
+```{r, echo=TRUE, warning=FALSE, cache=TRUE}
+edf_pack<-DiagrammeR::combine_edges(edf_import,
+                                     edf_depends) # Like rbind but different columns allowed
+# Nodes Connected to DiagrammeR with 30 step (enough to get them all!)
+nodes_DiagrammeR<-union(gtools::getDependencies("DiagrammeR",available=FALSE),"DiagrammeR")
+# EDF & NDF
+ndf_DiagrammeR<-data.frame(nodes=nodes_DiagrammeR)%>%dplyr::left_join(ndf_pack,by="nodes")
+edf_DiagrammeR<-dplyr::filter(edf_pack,from%in%nodes_DiagrammeR)
+# The Graph
+graph_DiagrammeR<-DiagrammeR::create_graph(ndf_DiagrammeR,
+                                           edf_DiagrammeR,
+                                           graph_attrs = c("layout = dot","overlap=FALSE"),
+                                           node_attrs = c("fontname = Helvetica"))
+# Specific Color for the DiagrammeR Node
+graph_DiagrammeR <- DiagrammeR::set_node_attrs(graph_DiagrammeR,
+                                              nodes = c("DiagrammeR"),
+                                              node_attr = "fillcolor", 
+                                              values = "blue")
+
+``` 
+
+## DOT Layout
+Flows the directed graph in the direction of rank 
+```{r, eval=FALSE, echo=TRUE, warning=FALSE, cache=TRUE, fig.height=4, fig.align='center'}
+DiagrammeR::render_graph(graph_DiagrammeR,output="graph")
+```
+![](figures/Dep-Dot.png)
+
+## twopi Layout
+Concentric Circles
+```{r, echo=TRUE, warning=FALSE, cache=TRUE, fig.height=4, fig.align='center'}
+graph_DiagrammeR<-DiagrammeR::set_global_graph_attrs(graph_DiagrammeR,"graph","layout","twopi")
+DiagrammeR::render_graph(graph_DiagrammeR,output="graph")
+```
+
+
+## neato Layout
+Attempts to minimize a global energy function
+
+```{r, echo=TRUE, warning=FALSE, cache=TRUE, fig.height=4, fig.align='center'}
+graph_DiagrammeR<-DiagrammeR::set_global_graph_attrs(graph_DiagrammeR,"graph","layout","neato")
+DiagrammeR::render_graph(graph_DiagrammeR,output="graph")
+```
+
+## circo Layout
+
+```{r, echo=TRUE, warning=FALSE, cache=TRUE, fig.height=4, fig.align='center'}
+graph_DiagrammeR<-DiagrammeR::set_global_graph_attrs(graph_DiagrammeR,"graph","layout","circo")
+DiagrammeR::render_graph(graph_DiagrammeR,output="graph")
+```
+
+
+###########################
+# Conclusion
+
+## Appraisal
+
+### Pros
+* DOT Language integration
+* Simple Design (EDFs, NDFs)
+* Visualisation Layout
+
+### Cons
+* Query Performance 
+
+## Session Info
+```{r, echo=FALSE}
+sessionInfo()
+```
+
