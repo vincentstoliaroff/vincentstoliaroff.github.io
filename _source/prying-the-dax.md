@@ -1,0 +1,32 @@
+Prying the Dax
+================
+
+### 0. Intro
+
+This post is the opening of a serie where I will make extensive use of a dataset of market prices for the german DAX 30 Stock Index and its components. Today, I will briefly explain how to get the input data and how to validate them through basic recomputation of Index Prices.
+
+The Dax (**D**eutscher **A**ktieninde**x**) is the most famous Stock Index of the german economy, consisting of the 30 major German companies traded on the Frankfurt Stock Exchange and quoted on the Xetra platform. It comes in 2 flavors:
+- A *total return Index* called the *performance-index* (Isin:DE0008469008)
+- And a *price index* called the *Kursindex* in german (Isin:DE0008467440)
+
+The most ubiquitous (in news report and as a benchmark of german economy) is the *performance-index*.
+
+*Remark: I have borrowed the title of this post to the R package `pryr` of Hadley Wickham. I just mean*
+
+### 1. Getting the Data
+
+The DAX components and their precise weights are available online on the website of the [Deutsche Börse](%3Chttp://www.dax-indices.com/EN/index.aspx?pageID=4). They are daily published as XL files along with a few other interesting variables (*beta*,*volatility*, and factors required to recompute the index price) The R script used to download the raw data is [here](http://vincentstoliaroff.github.io). But you can get the dataset directly \[here\], as I have processed and retreated it already.
+
+For the record, I will just comment quickly upon the data extraction process hereunder.
+
+##### Webscrapping
+
+The urls are easy to loop on. It took me about 30 minutes to get 6 years of Data History. I didn't really try to optimize the code. The only thing to take care of was the import of "n/a" which by default would induce a `char` type for the numeric variables downloaded (when encountered). I have used the 3 following packages:
+- `httr`: to test the existence of
+- `gdata`: to read the XL spreadsheet without relying on a Java Library based on - `dplyr`
+
+##### Data Cleaning
+
+### 3. Data Validation (Index Price recomputation)
+
+### 4. A few Graphics

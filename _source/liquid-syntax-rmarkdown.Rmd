@@ -1,0 +1,51 @@
+---
+layout: post
+title: Liquid Snippets in Rmarkdown documents
+output: github_document
+author: "Vincent"
+always_allow_html: yes
+comments: true
+categories: [blog]
+tags: [liquid, jekyll, rmarkdown]
+---
+
+## 
+
+
+
+## A few examples
+
+
+
+
+
+# Credits
+Googling around, I have found several ways to insert your images in a `[my_post].Rmd` files and render it on your GitHub User/Project Pages. 
+The one suggested [here](https://eduardoboucas.com/blog/2014/12/07/including-and-managing-images-in-jekyll.html) by [Eduardo Boucas](https://eduardoboucas.com/) particularly meets my needs.
+I have only tweaked it so that it can be directly implemented from within a `Rmarkdown` file.
+
+# Eduardo's Trick
+
+Create a `image.html` file in your `_includes` directory with the following content
+
+{% highlight html %}
+
+{% capture imagePath %}{{ page.date | date: "%Y-%m-%d" }}-{{ page.title | slugify }}/{{ include.name }}{% endcapture %}
+{% if include.caption %}
+    <figure>
+        <img src="/assets/posts/{{ imagePath }}" {% if include.alt %} alt="{{ include.alt }}" {% endif %} {% if include.width %} width="{{ include.width }}" {% endif %}/>
+        <figcaption>{{ include.caption }}</figcaption>
+    </figure>
+{% else %}
+    <img src="/assets/posts/{{ imagePath }}" {% if include.alt %} alt="{{ include.alt }}" {% endif %} {% if include.width %} width="{{ include.width }}" {% endif %}/>
+{% endif %}
+
+{% endhighlight %}
+
+Then when inserting an image 
+
+# ... And the solution for Rmarkdown documents
+
+
+
+

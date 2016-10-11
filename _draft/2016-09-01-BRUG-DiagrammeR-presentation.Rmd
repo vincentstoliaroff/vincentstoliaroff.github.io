@@ -4,11 +4,8 @@ title: Presentation Package DiagrammeR
 output: github_document
 always_allow_html: yes
 comments: true
-categories:
-- blog
-tags:
-- shell
-- rmarkdown
+categories: [blog]
+tags: [shell, rmarkdown]
 ---
 
 #############

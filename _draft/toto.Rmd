@@ -1,0 +1,25 @@
+---
+layout: post
+title: Presentation Package DiagrammeR
+output: github_document
+comments: true
+categories: [blog]
+tags: [shell, rmarkdown]
+---
+
+always_allow_html: yes
+
+```{r setup, include=FALSE, eval=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_chunk$set(fig.path='/assets/images-post/toto-')
+```
+
+{% include image name="BRUG-RDBM-RStudio.png" caption="Essai de légende" %}
+
+
+```{r}
+plot(rnorm(10))
+```
+
+
+<!-- ![Caption for the picture.](/home/vs/Data/Vincent/workspace/Jekyll/vincentstoliaroff.github.io/assets/images-post/BRUG-RDBM-RStudio.png) -->

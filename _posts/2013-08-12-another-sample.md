@@ -5,6 +5,15 @@ categories:
 - blog
 ---
 
+
+
+{% capture imagePath %}{{ page.date | date: "%Y-%m-%d" }}-{{ page.title | slugify }}/{{ include.name }}
+eduardo-trick.png{% endcapture %}
+
+<img src="/assets/images-post/BRUG-RDBM-RStudio.png" alt="toto">
+
+
+
 Tattooed roof party *vinyl* freegan single-origin coffee wayfarers tousled, umami yr 
 meggings hella selvage. Butcher bespoke seitan, cornhole umami gentrify put a bird 
 on it occupy trust fund. Umami whatever kitsch, locavore fingerstache Tumblr pork belly

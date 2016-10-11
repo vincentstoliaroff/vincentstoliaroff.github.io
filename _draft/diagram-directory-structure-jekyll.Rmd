@@ -1,0 +1,9 @@
+---
+layout: post
+title: Workflow Diagram
+output: github_document
+always_allow_html: yes
+comments: true
+categories: [blog]
+tags: [jekyll, rmarkdown]
+---
