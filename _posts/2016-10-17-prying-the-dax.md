@@ -1,4 +1,9 @@
-Prying the Dax \[Post in Progress\]
+---
+layout: post
+title: Prying the Dax \[Post in Progress\]
+categories:
+- blog
+---
 ================
 
 ### 0. Opening up the DAX!
@@ -20,9 +25,9 @@ The DAX components are daily published as XL files on the website of the [Deutsc
 The R script used to download the raw data is [here](http://vincentstoliaroff.github.io/vincentstoliaroff.github.io/).
 
 The urls are easy to loop on. It took me about 30 minutes to get 6 years of Data History. I didn't really try to optimize the code. The key functions I used are:
-- `httr::http_error`: to test the existence of urls ressources: as I loop on every possible dates, weekends and holidays should not be requested.
-- `gdata::read.xls`: to download and read the XL spreadsheet all at once. Here, the only thing to take care of, was the import of "n/a" which by default would induce a `char` type for the numeric variables downloaded (when encountered).
-- `dplyr::bind_rows`: to merge every downloaded dataset in one For consistency, the dataframe column names are identical to those in the XL file but white space are removed.
+- `httr::http_error`: to test the existence of urls ressources: as I loop on every possible dates, weekends and holidays should not be requested.  
+- `gdata::read.xls`: to download and read the XL spreadsheet all at once. Here, the only thing to take care of, was the import of "n/a" which by default would induce a `char` type for the numeric variables downloaded (when encountered).  
+- `dplyr::bind_rows`: to merge every downloaded dataset in one For consistency, the dataframe column names are identical to those in the XL file but white space are removed.  
 
 This final "raw" dataset is [here]()
 
@@ -65,7 +70,9 @@ Kt  = chaining factor
 Index = Kt * (Sum(pit * ffit * qit * ci) / Sum(pi0 * qi0)) * Base
 Index = (Sum(pit * Fit) / A) * Base
 -->
+  
 ### 3. A few Graphics
+
 
 ### 4. Stay tuned! To come next
 
