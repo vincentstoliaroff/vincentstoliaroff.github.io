@@ -9,13 +9,14 @@ categories: [blog]
 tags: [liquid, jekyll, rmarkdown]
 ---
 
-## 
+### Forewords 
 
 
+### The streamline from Rmarkdown docu to public blog
+I know 2 options 
 
-## A few examples
 
-
+### A few examples
 
 
 
