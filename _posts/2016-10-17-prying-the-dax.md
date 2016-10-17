@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Prying the Dax \[Post in Progress\]
+title: Prying the Dax -  Post in progress
 categories:
 - blog
 ---
