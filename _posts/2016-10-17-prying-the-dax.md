@@ -71,10 +71,10 @@ Index = Kt * (Sum(pit * ffit * qit * ci) / Sum(pi0 * qi0)) * Base
 Index = (Sum(pit * Fit) / A) * Base
 -->
   
-### 3. A few Graphics
+### 2. A few Graphics
 
 
-### 4. Stay tuned! To come next
+### 3. Stay tuned! To come next
 
 The painful task of extracting and cleansing the data is now over... Let's start having fun now with mining, statistics and trading... In the next posts, we will discuss:
 - different VaR computation methodologies for the DAX basket.
